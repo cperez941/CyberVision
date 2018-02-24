@@ -40,7 +40,6 @@ class my_motion_detector(object):
     # Then, apply vectors between differences of images
     # If there's >15 vectors with >80 magnitude, then there's motion
     def write(self, s):
-	print(s)
         data = np.fromstring(s, dtype=motion_dtype)
         data = data.reshape((self.rows, self.cols))
         data = np.sqrt(
