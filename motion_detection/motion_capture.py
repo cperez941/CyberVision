@@ -12,7 +12,7 @@ import picamera
 import numpy as np
 import time
 
-# Set up sum of absolute differences
+# Set up motion data
 motion_dtype = np.dtype([
     ('x', 'i1'),
     ('y', 'i1'),
