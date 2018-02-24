@@ -21,6 +21,9 @@ motion_dtype = np.dtype([
 
 # make params of video recording/motion detection easier to manipulate to
 # enable quicker calibration
+# TO DO
+# Enable automated calibration
+# Incorporate SAD
 camera_settings = {'width': 640, 'height': 480,'fps': 30, 'record_time': 5}
 motion_sensitivity = {'max number of vectors': 17, 'max magnitude of vectors': 86}
 
@@ -29,8 +32,6 @@ class my_motion_detector(object):
 
     def __init__(self, camera):
         width, height = camera.resolution
-        #self.vector_num_limit = 17
-        #self.vector_mag_limit = 86
         self.cols = (width + 15) // 16
         self.cols += 1  # there's always an extra column
         self.rows = (height + 15) // 16
