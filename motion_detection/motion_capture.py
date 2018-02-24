@@ -2,8 +2,8 @@
 # Date : 22 Feb 2018
 # Title : Motion Capture
 # Description : Takes video stream, and when the vectors between
-# multiple images reach a specified thresold, record for ~35 seconds and save
-# the raw video file in the working directory.
+# multiple images reach a specified thresold, hold past 5 seconds of recording
+# record for 30 second and save the raw video file in the working directory.
 # NOTE : MUST BE EXECUTED ON A RASPBERRY PI
 
 from __future__ import division
