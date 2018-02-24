@@ -1,5 +1,5 @@
 # Motion Detection
-This is python based motion detection and recording algorithm based on the Sum of Absolute Differences.
+This is python based motion detection and recording algorithm.
 
 # Requirements + Dependencies
 ### Hardware Requirements

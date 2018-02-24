@@ -1,8 +1,8 @@
 # Author : Dave Jones (with minor edits by Carl Perez)
 # Date : 22 Feb 2018
 # Title : Motion Capture
-# Description : Takes the SAD of several images, and when the vectors between
-# multiples images reach a specified thresold, record for ~35 seconds and save
+# Description : Takes video stream, and when the vectors between
+# multiple images reach a specified thresold, record for ~35 seconds and save
 # the raw video file in the working directory.
 # NOTE : MUST BE EXECUTED ON A RASPBERRY PI
 
@@ -36,7 +36,7 @@ class my_motion_detector(object):
         self.rows = (height + 15) // 16
 
     # Load the motion data from the string to a numpy array
-    # Then, apply SAD to the image, and check for vector threshold
+    # Then, apply vectors between differences of images
     # If there's >15 vectors with >80 magnitude, then there's motion
     def write(self, s):
 	print(s)

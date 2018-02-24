@@ -1,7 +1,7 @@
 # Author : Carl Perez
 # Date : 22 Feb 2018
 # Title : Execute Motion Capture
-# Description : Activates SAD motion detection script and sends it back
+# Description : Activates motion detection script and sends it back
 # to the host for conversion into a usable .avi for further analysis
 
 import paramiko, sys, time, os, subprocess
