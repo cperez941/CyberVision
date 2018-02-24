@@ -30,5 +30,5 @@ ssh -oHostKeyAlgorithms='ssh-rsa' -o  UserKnownHostsFile=./.ssh/cyber_vision_kno
 3. Move the **motion_capture.py** script to the **/home/pi/cyber_vision/** on  your Raspberry Pi. This can be done via SCP or SFTP.
 4. Ensure that the *pi_server* and *pi_username* inside **execute_motion_capture.py** match the login you use to SSH into your Raspberry, the executor script will fail to execute the motion capture script.
 5. Execute **execute_motion_capture.py** with Python.
-6. View your time stamped .avi file in **/path/to/CyberVision/motion_detection/avi_video** and see if it properly detections motion.
+6. View your time stamped .avi file in **/path/to/CyberVision/motion_detection/avi_video** and see if it properly detects motion.
 7. If it does not, tinker with the *camera_settings* and *motion_sensitivity* dictionaries in **motion_capture.py**. (preferably on the Pi, but you can edit it locally and re-move it to the Pi).
