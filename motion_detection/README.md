@@ -32,3 +32,9 @@ ssh -oHostKeyAlgorithms='ssh-rsa' -o  UserKnownHostsFile=./.ssh/cyber_vision_kno
 5. Execute **execute_motion_capture.py** with Python.
 6. View your time stamped .avi file in **/path/to/CyberVision/motion_detection/avi_video** and see if it properly detects motion.
 7. If it does not, tinker with the *camera_settings* and *motion_sensitivity* dictionaries in **motion_capture.py**. (preferably on the Pi, but you can edit it locally and re-move it to the Pi).
+
+### Alternative execution
+1. Place motion detection (motion_capture and motion_detect) on your Pi
+2. Execute motion_capture for a desired amount of time
+3. Place before and after raw files on your local machine
+4. Convert with a program of choice your
