@@ -2,14 +2,19 @@ import io
 import picamera
 import motion_detect
 import ConfigParser
-import io
+import time
 from PIL import Image
 
 prior_image = None
+file_number = 1
+total_video_length = 0
+first_video_started_at = 0
+last_video_started_at = 0
+last_video_ended_at = time.time()
 
-
-config = ConfigParser.RawConfigParser(allow_no_value=True)
-config.readfp(io.BytesIO(sample_config))
+conf_raw = ConfigParser.ConfigParser()
+conf_raw.read('config.ini')
+config = {section: dict(conf_raw.items(section)) for section in conf_raw.sections()}
 
 def detect_motion(camera):
     global prior_image
@@ -23,19 +28,20 @@ def detect_motion(camera):
     # Compare current_image to prior_image to detect motion. This is left
     # as an exercise for the reader!
     is_there_motion = motion_detect.detect(
-            current_image,
-            prior_image,
-            0,
-            0.0002
-        )
+        current_image,
+        prior_image,
+        int(config['motion_detection']['threshold']),
+        float(config['motion_detection']['minimum_area'])
+    )
     # Once motion detection is done, make the current image the prior one
     prior_image = current_image
     return is_there_motion
 
-def write_before(stream):
+
+def write_before(stream, filename):
     # Write the entire content of the circular buffer to disk. No need to lock
     # the stream here as we're definitely not writing to it simultaneously
-    with io.open('before.h264', 'wb') as output:
+    with io.open(filename, 'wb') as output:
         for frame in stream.frames:
             if frame.header:
                 stream.seek(frame.position)
@@ -49,29 +55,72 @@ def write_before(stream):
     stream.seek(0)
     stream.truncate()
 
+
 def process_motion(camera):
-    stream = picamera.PiCameraCircularIO(camera, seconds=config['recording_settings']['margin'])
+    global file_number
+    global total_video_length
+    global prior_image
+    global first_video_started_at
+    global last_video_ended_at
+
+    stream = picamera.PiCameraCircularIO(
+        camera, seconds=int(config['recording_settings']['margin']))
     camera.start_recording(stream, format='h264')
     try:
         while True:
-            camera.wait_recording(5)
+            camera.wait_recording(
+                int(config['motion_detection']['interval']))
             if detect_motion(camera):
-                # As soon as we detect motion, split the recording to record
-                # the bits "after" motion
-                camera.split_recording('after.h264')
-                # While that's going, write the 10 seconds "before" motion to
-                # disk as well, and wipe the circular stream
-                write_video(stream)
-                # Wait until motion is no longer detected, then split recording
-                # back to the in-memory circular buffer
-                while detect_motion(camera):
-                    camera.wait_recording(5)
+                print('Motion detected.')
+                last_video_started_at = time.time()
+
+                if first_video_started_at == 0:
+                    first_video_started_at = time.time()
+
+                # split the stream
+                camera.split_recording(
+                    "motion_video%d.h264" % (file_number + 1))
+                # Write the 10 seconds "before" motion to disk as well, and update the file number
+                write_before(stream, "motion_video%d.h264" % file_number)
+                file_number += 2
+                current_length = total_video_length
+
+                # Wait until motion is no longer detected, then split
+                # recording back to the in-memory circular buffer
+                while current_length < int(config['recording_settings']['maximum_chunk_length']) and detect_motion(camera):
+                    current_length = total_video_length + time.time() - last_video_started_at
+                    camera.wait_recording(
+                        int(config['motion_detection']['interval']))
+
+                print('Motion no longer detected.')
+                last_video_ended_at = time.time()
+                total_video_length += last_video_ended_at - last_video_started_at
+
+                print("Total length of video stream: %ds" %
+                      total_video_length)
                 camera.split_recording(stream)
+
+                if total_video_length >= int(config['recording_settings']['maximum_video_length']):
+                    print("Maximum video length reached")
+                    break
+
+                if file_number / 2 > int(config['recording_settings']['maximum_chunk_count']):
+                    print("Maximum chunk count reached")
+                    break
+
+                elif first_video_started_at > 0 and time.time() - first_video_started_at > int(config['recording_settings']['maximum_recording_time']):
+                    print("Maximum recording time reached")
+                    break
+                elif last_video_ended_at > 0 and time.time() - last_video_ended_at > int(config['recording_settings']['maximum_idle_time']):
+                    print("Maximum idle time reached")
+                    break
     finally:
         camera.stop_recording()
 
 
 if __name__ == '__main__':
+
     with picamera.PiCamera() as camera:
-        camera.resolution = (1280, 720)
+        camera.resolution = (
+            int(config['camera_settings']['width']), int(config['camera_settings']['height']))
         process_motion(camera)
