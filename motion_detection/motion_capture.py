@@ -79,10 +79,10 @@ def process_motion(camera):
 
                 # split the stream
                 camera.split_recording(
-                    "motion_video%d.h264" % (file_number + 1))
+                    "after_motion%d.h264" % file_number)
                 # Write the 10 seconds "before" motion to disk as well, and update the file number
-                write_before(stream, "motion_video%d.h264" % file_number)
-                file_number += 2
+                write_before(stream, "before_motion%d.h264" % file_number)
+                file_number += 1
                 current_length = total_video_length
 
                 # Wait until motion is no longer detected, then split
@@ -104,7 +104,7 @@ def process_motion(camera):
                     print("Maximum video length reached")
                     break
 
-                if file_number / 2 > int(config['recording_settings']['maximum_chunk_count']):
+                if file_number > int(config['recording_settings']['maximum_chunk_count']):
                     print("Maximum chunk count reached")
                     break
 
