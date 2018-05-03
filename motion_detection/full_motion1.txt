@@ -1,0 +1,2 @@
+file './avi_video/before_motion2.avi'
+file './avi_video/after_motion2.avi'
